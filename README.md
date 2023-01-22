@@ -124,6 +124,61 @@ auto_data =spark.sql('SELECT * FROM default.automobile_data')
 display(auto_data)
 
 
+auto_data = spark.sql('SELECT * FROM default.automobile_data')
 
+auto_data_subset = spark.sql("SELECT MAKE, \
+                             'body-style',\
+                             price,\
+                             horsepower\
+                             FROM default.automobile_data\
+                             WHERE price > 20000\
+                             ")
+                             
+                             
+from pyspark.sql.functions import initcap, upper, lower
+from pyspark.sql.functions import translate
+netflix_data = spark.sql('SELECT * FROM default.netflix_list')
+display(netflix_data.select(upper('title'), lower('genres')))
+display(netflix_data.select('title','type',initcap('type')))
+display(netflix_data.select('title','origin_country',regexp_replace('language','En*','en')))
+
+display(
+    netflix_data.select('title',translate('title','io','10'))
+)
+
+netflix_data.createOrReplaceTempView('netflix_data_table')
+
+```
+
+```
+people_data = spark.read.option('multiline',False)\
+    .json('dbfs:/FileStore/tables/people.json')
+iris_data = spark.read.option("multiline",True)\
+    .json('dbfs:/FileStore/tables/iris.json')
+employee_data = spark.read.option("multiline",True)\
+    .option("mode","PERMISSIVE")\
+    .json('dbfs:/FileStore/tables/employees.json')
+    
+    
+display(people_data.filter(people_data.age >= 30))
+display(iris_data.select('species').distinct())
+display(employee_data.select("name","salary","address","contact"))
+display(employee_data.select("name","salary","address.city","contact"))
+
+
+
+from pyspark.sql import functions as F
+display(employee_data.select(F.col('contact.email')
+                             .getItem(0)
+                             .alias('email_address')
+                            ))
+                            
+ display(employee_data.select('name',
+                             F.col('contact.email').getItem(0).alias('email_address'),
+                             F.col('contact.phone').getItem(1).alias('phone_number')
+                            ))
+                            
+                            
+                            
 
 ```
